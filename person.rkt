@@ -4,12 +4,10 @@
 
 (provide
  (contract-out
-  [struct person ((posn position?))]
-  [walk (-> person? person?)]
-  ;; [change-direction (-> person? person?)] ;; maybe not provide in interface?
+  [struct person ((age number?) (posn position?))]
   ))
 
-(struct person (posn) #:transparent #:mutable)
+(struct person (age posn) #:transparent #:mutable)
 
 (define (walk p)
   (let* ([old-posn (person-posn p)]
@@ -25,7 +23,7 @@
 
   (require rackunit rackunit/text-ui)
 
-  (define p1 (person (position 0 0)))
-  (walk p1)
+  (define p1 (person 40 (position 0 0)))
+  p1
 
   )
