@@ -1,28 +1,23 @@
-#lang racket
+#lang typed/racket
 
-(provide
- (contract-out
-  [struct position ((x number?) (y number?))]
-  [move (-> position? number? number? position?)]
-  ))
 
-(struct position (x y) #:transparent)
+(struct posn ([x : Real] [y : Real]) #:transparent)
 
+(: move (-> posn Real Real posn))
 (define (move p dx dy)
-  (let* ([ox (position-x p)]
-         [oy (position-y p)]
+  (let* ([ox (posn-x p)]
+         [oy (posn-y p)]
          [nx (+ ox dx)]
          [ny (+ oy dy)]
          )
-    (position nx ny)))
-
+    (posn nx ny)))
 
 (module+ test
 
-  (require rackunit rackunit/text-ui)
+  (require typed/rackunit typed/rackunit/text-ui)
 
-  (let ([posn1 (position 0 0)]
+  (let ([posn1 (posn 0 0)]
         )
-    (check-equal? (move posn1 1 1) (position 1 1)))
+    (check-equal? (move posn1 1 1) (posn 1 1)))
 
   )
