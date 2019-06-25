@@ -4,7 +4,8 @@
 
 (provide [struct-out posn])
 (provide move
-         move/random)
+         move/random
+         move/random/track)
 
 (struct posn ([x : Real] [y : Real]) #:transparent)
 
@@ -21,16 +22,18 @@
 (: move/random (-> posn posn))
 (define (move/random p)
   (let ([choice : Integer (random 4)]
-        [x : Real (posn-x p)]
-        [y : Real (posn-y p)]
+        [delta : Integer 10]
         )
-    (posn
-     (cond
-       [(= choice 0) (add1 x)]
-       [(= choice 1) (sub1 x)]
-       [(= choice 2) (add1 y)]
-       [else (sub1 y)]
-       ) y))
+    (cond
+      [(= choice 0) (move p delta 0)]
+      [(= choice 1) (move p (- delta) 0)]
+      [(= choice 2) (move p 0 delta)]
+      [else (move p 0 (- delta))]))
+  )
+
+(: move/random/track (-> (Listof posn) (Listof posn)))
+(define (move/random/track lop)
+  (cons (move/random (first lop)) lop)
   )
 
 (module+ test

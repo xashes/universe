@@ -5,3 +5,35 @@
 
 (require "position.rkt")
 
+; constants
+(define WIDTH 800)
+(define HEIGHT 800)
+(define MTS (empty-scene WIDTH HEIGHT))
+
+(define WALKER (circle 20 'solid 'green))
+(define WS0 (posn (/ WIDTH 2) (/ HEIGHT 2)))
+
+; world state
+(define-type WorldState posn)
+
+; functions
+(: simulator (-> WorldState WorldState))
+(define (simulator ws)
+  (big-bang ws : WorldState
+            [to-draw render]
+            [on-tick move/random 1/28]
+            )
+  )
+
+(: render (-> WorldState Image))
+(define (render ws)
+  (let ([x (posn-x ws)]
+        [y (posn-y ws)])
+    (place-image WALKER
+                 x y
+                 MTS)))
+
+(module+ main
+
+  (simulator WS0)
+  )
