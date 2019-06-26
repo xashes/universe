@@ -1,32 +1,42 @@
-#lang typed/racket
+#lang racket
 
-(require typed/2htdp/universe
-         typed/2htdp/image)
+(require 2htdp/image
+         2htdp/universe)
 
 (require "position.rkt")
 
 ; constants
-(: BALL Image)
 (define BALL (circle 20 'solid 'red))
 
 (define WIDTH 800)
 (define HEIGHT 200)
 (define MTS (empty-scene WIDTH HEIGHT))
 
-(define XSPEED 1)
-(define YSPEED 3)
+(define XSPEED 10)
+(define YSPEED 30)
 
-(: bouncing (-> posn posn))
 (define (bouncing p)
-  p
-  )
-(module+ test
+  (let ([x (posn-x p)]
+        [y (posn-y p)])
+    (cond
+      [(or (< x 0) (> x WIDTH)) (begin (set! XSPEED (- XSPEED))
+                                         (move p XSPEED YSPEED))]
+      [(or (< y 0) (> y HEIGHT)) (begin (set! YSPEED (- YSPEED))
+                                          (move p XSPEED YSPEED))]
+      [else (move p XSPEED YSPEED)]
+      )))
 
-  (require typed/rackunit typed/rackunit/text-ui)
+(define (render p)
+  (place-image BALL
+               (posn-x p) (posn-y p)
+               MTS))
 
-  (check-equal? (bouncing (posn -1 0))
-                (posn 0 3))
-  (check-equal? (bouncing (posn WIDTH HEIGHT))
-                (posn (- WIDTH XSPEED) (- HEIGHT YSPEED)))
+(define (run p)
+  (big-bang p
+            [on-tick bouncing]
+            [on-draw render]))
 
+(module+ main
+
+  (run (posn 0 (/ HEIGHT 2)))
   )
