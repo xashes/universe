@@ -21,7 +21,7 @@
 (define (simulator ws)
   (big-bang ws : WorldState
             [to-draw render]
-            [on-tick move/random 1/28]
+            [on-tick move/random 1]
             )
   )
 

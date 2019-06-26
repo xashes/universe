@@ -21,14 +21,11 @@
 ; random walk
 (: move/random (-> posn posn))
 (define (move/random p)
-  (let ([choice : Integer (random 4)]
-        [delta : Integer 10]
+  (let ([dx : Integer (random -10 11)]
+        [dy : Integer (random -10 11)]
         )
-    (cond
-      [(= choice 0) (move p delta 0)]
-      [(= choice 1) (move p (- delta) 0)]
-      [(= choice 2) (move p 0 delta)]
-      [else (move p 0 (- delta))]))
+    (move p dx dy)
+    )
   )
 
 (: move/random/track (-> (Listof posn) (Listof posn)))
