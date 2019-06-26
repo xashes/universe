@@ -21,14 +21,14 @@
 (define (simulator ws)
   (big-bang ws : WorldState
             [to-draw render]
-            [on-tick move/random 1]
+            [on-tick move/gaussian 1/8]
             )
   )
 
 (: render (-> WorldState Image))
 (define (render ws)
-  (let ([x (posn-x ws)]
-        [y (posn-y ws)])
+  (let ([x (modulo (exact-floor (posn-x ws)) WIDTH)]
+        [y (modulo (exact-floor (posn-y ws)) HEIGHT)])
     (place-image WALKER
                  x y
                  MTS)))

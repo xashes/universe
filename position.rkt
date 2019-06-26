@@ -33,6 +33,27 @@
   (cons (move/random (first lop)) lop)
   )
 
+(: move/upper-right (-> posn posn))
+(define (move/upper-right p)
+  (let ([rnd (random)])
+    (cond
+      [(< rnd 0.3) (move p 0 -10)]
+      [(< rnd 0.5) (move p 0 10)]
+      [(< rnd 0.7) (move p -10 0)]
+      [else (move p 10 0)]
+      ))
+  )
+(provide move/upper-right)
+
+(provide move/gaussian)
+(define GS (normal-dist 0 60))
+(: move/gaussian (-> posn posn))
+(define (move/gaussian p)
+  (let ([dx : Real (sample GS)]
+        [dy : Real (sample GS)])
+    (move p dx dy))
+  )
+
 (module+ test
 
   (require typed/rackunit typed/rackunit/text-ui)
