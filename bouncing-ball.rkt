@@ -47,11 +47,9 @@
   (let ([x (array-ref loc #(0))]
         [y (array-ref loc #(1))])
     (cond
-      [(or (< x 0) (> x WIDTH)) (begin (redirect VEL #(0))
-                                       (move loc VEL))]
-      [(or (< y 0) (> y HEIGHT)) (begin (redirect VEL #(1))
-                                        (move loc VEL))]
-      [else (move loc VEL)]))
+      [(or (< x 0) (> x WIDTH)) (redirect VEL #(0))]
+      [(or (< y 0) (> y HEIGHT)) (redirect VEL #(1))]))
+  (move loc VEL)
   )
 
 (define (run loc)
