@@ -44,7 +44,7 @@
 
     ; motion algorithm
     (define/public (update)
-      (set! current-acceleration (random-nd 2 (uniform-dist -1 1)))
+      (set! current-acceleration (vector-normalize (random-nd 2 (uniform-dist -1 1))))
       (set! current-location (vector-map + current-location current-velocity))
       (set! current-velocity (vector-limit (vector-map + current-velocity current-acceleration) max-vel))
       )

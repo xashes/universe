@@ -2,6 +2,14 @@
 
 (require math)
 
+(provide (contract-out [vector-scale (-> (vectorof real?) real? (vectorof real?))]))
+(define (vector-scale vec n)
+  (vector-map (lambda (x) (* x n)) vec)
+  )
+(module+ test
+  (check-equal? (vector-scale #(1 2 3) 3) #(3 6 9))
+  )
+
 (provide (contract-out [vector-magnitude (-> (vectorof real?) real?)]))
 (define (vector-magnitude vec)
   (sqrt (apply + (vector->list (vector-map sqr vec))))
