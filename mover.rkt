@@ -20,10 +20,10 @@
            [apply-force (->m (vectorof real?) void?)]
            )
   (class object%
-    (init-field [location (vector (/ WIDTH 2) (/ HEIGHT 2))]
+    (init-field [mass 20]
+                [location (vector (/ WIDTH 2) (/ HEIGHT 2))]
                 [velocity #(0 0)]
                 [acceleration #(0 0)]
-                [mass 10]
                 [color 'red]
                 [top-speed 6]
                 )
@@ -32,7 +32,7 @@
 
     (super-new)
 
-    (define (figure)
+    (define/public (figure)
       (circle mass 'solid color)
       )
 
@@ -59,13 +59,12 @@
       )
 
     (define/public (apply-force f)
-      (let ([acc (/ f mass)])
+      (let ([acc (vector-scale f (/ mass 1))])
         (set! acceleration (vector-map + acc acceleration)))
       )
 
     ; motion algorithm
     (define/public (update)
-      (update-acc)
       (set! velocity (vector-limit (vector-map + velocity acceleration) top-speed))
       (set! location (vector-map + location velocity))
       (set! acceleration #(0 0))
@@ -80,40 +79,57 @@
                        bg
                        ))))))
 
-; WorldState ::= mover%
-(provide (contract-out [tick (-> (is-a?/c mover%) (is-a?/c mover%))]))
-(define (tick m)
-  (send m update)
-  m
-  )
+; force ::= (vectorof real?)
+(provide (contract-out [wind (-> (vectorof real?))]))
+(define (wind)
+  (random-nd 2 (normal-dist 6 16)))
 
-(provide (contract-out [render (-> (is-a?/c mover%) image?)]))
-(define (render m)
-  (send m render MTS)
-  )
+(provide (contract-out [gravity (-> (vectorof real?))]))
+(define (gravity)
+  #(0 9.8))
 
-(provide (contract-out [mouse-hd (-> (is-a?/c mover%) integer? integer? mouse-event? (is-a?/c mover%))]))
-(define (mouse-hd m x y me)
-  (let ([target (vector x y)])
-    (send m update-target target)
+; WorldState ::= (listof mover%)
+(provide (contract-out [tick (-> (listof (is-a?/c mover%)) (listof (is-a?/c mover%)))]))
+(define (tick lom)
+  (for/list ([m (in-list lom)])
+    (send m apply-force (wind))
+    (send m apply-force (gravity))
+    (send m update)
     m)
   )
 
-(define/contract (simulate m0)
-  (-> (is-a?/c mover%) (is-a?/c mover%))
-  (big-bang m0
+(provide (contract-out [render (-> (listof (is-a?/c mover%)) image?)]))
+(define (render lom)
+  (for/fold ([bg MTS])
+            ([m (in-list lom)])
+    (send m render bg))
+  )
+
+;; (provide (contract-out [mouse-hd (-> (is-a?/c mover%) integer? integer? mouse-event? (is-a?/c mover%))]))
+;; (define (mouse-hd m x y me)
+;;   (let ([target (vector x y)])
+;;     (send m update-target target)
+;;     m)
+;;   )
+
+(define/contract (simulate lom)
+  (-> (listof (is-a?/c mover%)) (listof (is-a?/c mover%)))
+  (big-bang lom
             [to-draw render]
-            [on-mouse mouse-hd]
             [on-tick tick]
             )
   )
 
-(module+ main
+(define M0 (new mover%))
 
-  (define M0 (new mover%
-                  [location (vector 0 0)]
-                  [velocity (vector 0 0)]
-                  [acceleration #(0 0)]
-                  ))
-  (simulate M0)
+(provide (contract-out [create-movers (-> positive-integer? (listof (is-a?/c mover%)))]))
+(define (create-movers n)
+  (for/list ([i (in-range n)])
+    (new mover%
+         [location (vector (random 0 WIDTH) 0)]
+         [mass (random 0 30)]))
   )
+
+(define movers (create-movers 10))
+
+(simulate movers)
