@@ -13,8 +13,7 @@
 
 ; class
 (define/contract mover%
-  (class/c [update-target (->m (vectorof real?) void?)]
-           [update (->m void?)]
+  (class/c [update (->m void?)]
            [figure (->m image?)]
            [render (->m image? image?)]
            [apply-force (->m (vectorof real?) void?)]
@@ -28,34 +27,10 @@
                 [top-speed 6]
                 )
 
-    (define target (vector 200 200))
-
     (super-new)
 
     (define/public (figure)
       (circle mass 'solid color)
-      )
-
-    (define/public (update-target vec)
-      (set! target vec)
-      )
-
-    (define/private (target-vec)
-      (vector-map - target location)
-      )
-
-    (define/private (acc-mag)
-      (vector-magnitude (target-vec))
-      )
-
-    ; -> real?
-    (define/private (gravity)
-      (/ 6
-         (+ (acc-mag) 1)))
-
-    ; -> void?
-    (define/private (update-acc)
-      (set! acceleration (vector-scale (vector-normalize (target-vec)) (gravity)))
       )
 
     (define/public (apply-force f)
@@ -105,13 +80,6 @@
     (send m render bg))
   )
 
-;; (provide (contract-out [mouse-hd (-> (is-a?/c mover%) integer? integer? mouse-event? (is-a?/c mover%))]))
-;; (define (mouse-hd m x y me)
-;;   (let ([target (vector x y)])
-;;     (send m update-target target)
-;;     m)
-;;   )
-
 (define/contract (simulate lom)
   (-> (listof (is-a?/c mover%)) (listof (is-a?/c mover%)))
   (big-bang lom
@@ -119,8 +87,6 @@
             [on-tick tick]
             )
   )
-
-(define M0 (new mover%))
 
 (provide (contract-out [create-movers (-> positive-integer? (listof (is-a?/c mover%)))]))
 (define (create-movers n)
